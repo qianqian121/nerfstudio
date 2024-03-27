@@ -56,6 +56,10 @@ from nerfstudio.data.dataparsers.phototourism_dataparser import (
 from nerfstudio.data.dataparsers.scannet_dataparser import ScanNetDataParserConfig
 from nerfstudio.data.dataparsers.sdfstudio_dataparser import SDFStudioDataParserConfig
 from nerfstudio.data.dataparsers.sitcoms3d_dataparser import Sitcoms3DDataParserConfig
+# NOTE HERE: Import dataparser for Argoverse 2
+from nerfstudio.data.dataparsers.argo_dataparser import ArgoDataParserConfig
+# NOTE HERE: Import dataparser for KITTI-360
+from nerfstudio.data.dataparsers.kitti_dataparser import KittiDataParserConfig
 from nerfstudio.data.datasets.base_dataset import InputDataset
 from nerfstudio.data.pixel_samplers import (
     EquirectangularPixelSampler,
@@ -115,6 +119,8 @@ AnnotatedDataParserUnion = tyro.conf.OmitSubcommandPrefixes[  # Omit prefixes of
             "sdfstudio-data": SDFStudioDataParserConfig(),
             "nerfosr-data": NeRFOSRDataParserConfig(),
             "sitcoms3d-data": Sitcoms3DDataParserConfig(),
+            "argo-data": ArgoDataParserConfig(),  # NOTE HERE #
+            "kitti-data": KittiDataParserConfig(),  # NOTE HERE #
         },
         prefix_names=False,  # Omit prefixes in subcommands themselves.
     )
