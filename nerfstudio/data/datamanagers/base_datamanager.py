@@ -60,6 +60,8 @@ from nerfstudio.data.dataparsers.sitcoms3d_dataparser import Sitcoms3DDataParser
 from nerfstudio.data.dataparsers.argo_dataparser import ArgoDataParserConfig
 # NOTE HERE: Import dataparser for KITTI-360
 from nerfstudio.data.dataparsers.kitti_dataparser import KittiDataParserConfig
+# NOTE HERE: Import dataparser for gt pipeline
+from nerfstudio.data.dataparsers.gt_dataparser import GtDataParserConfig
 from nerfstudio.data.datasets.base_dataset import InputDataset
 from nerfstudio.data.pixel_samplers import (
     EquirectangularPixelSampler,
@@ -103,6 +105,10 @@ def variable_res_collate(batch: List[Dict]) -> Dict:
     return new_batch
 
 
+"""Union over possible dataparser types, annotated with metadata for tyro. This is the
+same as the vanilla union, but results in shorter subcommand names."""
+
+
 AnnotatedDataParserUnion = tyro.conf.OmitSubcommandPrefixes[  # Omit prefixes of flags in subcommands.
     tyro.extras.subcommand_type_from_defaults(
         {
@@ -121,14 +127,11 @@ AnnotatedDataParserUnion = tyro.conf.OmitSubcommandPrefixes[  # Omit prefixes of
             "sitcoms3d-data": Sitcoms3DDataParserConfig(),
             "argo-data": ArgoDataParserConfig(),  # NOTE HERE #
             "kitti-data": KittiDataParserConfig(),  # NOTE HERE #
+            "gt-data": GtDataParserConfig(),  # NOTE HERE #
         },
         prefix_names=False,  # Omit prefixes in subcommands themselves.
     )
 ]
-"""Union over possible dataparser types, annotated with metadata for tyro. This is the
-same as the vanilla union, but results in shorter subcommand names."""
-
-
 @dataclass
 class DataManagerConfig(InstantiateConfig):
     """Configuration for data manager instantiation; DataManager is in charge of keeping the train/eval dataparsers;

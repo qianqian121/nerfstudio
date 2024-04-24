@@ -23,10 +23,10 @@ CONSOLE = Console(width=120)
 
 
 @dataclass
-class ArgoDataParserConfig(DataParserConfig):
+class GtDataParserConfig(DataParserConfig):
     """Scene dataset parser config"""
 
-    _target: Type = field(default_factory=lambda: Argo)
+    _target: Type = field(default_factory=lambda: Gt)
     """target class to instantiate"""
     data: Path = Path("data/Argo/sample_001")
     """Directory specifying location of data."""
@@ -50,10 +50,10 @@ class ArgoDataParserConfig(DataParserConfig):
 
 
 @dataclass
-class Argo(DataParser):
+class Gt(DataParser):
     """Argo Dataset"""
 
-    config: ArgoDataParserConfig
+    config: GtDataParserConfig
 
     def _generate_dataparser_outputs(self, split="train"):  # pylint: disable=unused-argument,too-many-statements
         # correct data path
@@ -72,9 +72,9 @@ class Argo(DataParser):
             meta = load_from_json(meta_file)
             
             # TODO Currently assumes that only FRONT camera is used
-            image_filename = data_root / "images" / f"{meta['frame_offset']}_{meta['camera']}.jpg"
-            mask_filename = data_root / "masks" / f"{meta['frame_offset']}_{meta['camera']}.png"
-            depth_filename = data_root / "depths" / f"{meta['frame_offset']}_{meta['camera']}.npy"
+            image_filename = data_root / "images" / f"{meta['camera']}_{meta['frame_id']}.jpg"
+            mask_filename = data_root / "masks" / f"{meta['camera']}_{meta['frame_id']}.png"
+            depth_filename = data_root / "depths" / f"{meta['camera']}_{meta['frame_id']}.npy"
 
             intrinsics = torch.tensor(meta["intrinsic"], dtype=torch.float32)
             camtoworld = torch.tensor(meta["camtoworld"], dtype=torch.float32)
