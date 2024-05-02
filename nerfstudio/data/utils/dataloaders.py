@@ -113,7 +113,7 @@ class CacheDataloader(DataLoader):
                 res = executor.submit(self.dataset.__getitem__, idx)
                 results.append(res)
 
-            for res in track(results, description="Loading data batch", transient=True):
+            for res in results:
                 batch_list.append(res.result())
 
         return batch_list
@@ -183,7 +183,7 @@ class EvalDataloader(DataLoader):
         """
         camera = self.cameras[image_idx : image_idx + 1]
         batch = self.input_dataset[image_idx]
-        batch = get_dict_to_torch(batch, device=self.device, exclude=["image"])
+        batch = get_dict_to_torch(batch, device=self.device)
         assert isinstance(batch, dict)
         return camera, batch
 
@@ -195,7 +195,7 @@ class EvalDataloader(DataLoader):
         """
         ray_bundle = self.cameras.generate_rays(camera_indices=image_idx, keep_shape=True)
         batch = self.input_dataset[image_idx]
-        batch = get_dict_to_torch(batch, device=self.device, exclude=["image"])
+        batch = get_dict_to_torch(batch, device=self.device)
         assert isinstance(batch, dict)
         return ray_bundle, batch
 
