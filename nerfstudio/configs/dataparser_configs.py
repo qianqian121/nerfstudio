@@ -36,6 +36,12 @@ from nerfstudio.data.dataparsers.scannet_dataparser import ScanNetDataParserConf
 from nerfstudio.data.dataparsers.scannetpp_dataparser import ScanNetppDataParserConfig
 from nerfstudio.data.dataparsers.sdfstudio_dataparser import SDFStudioDataParserConfig
 from nerfstudio.data.dataparsers.sitcoms3d_dataparser import Sitcoms3DDataParserConfig
+# NOTE HERE: Import dataparser for Argoverse 2
+from nerfstudio.data.dataparsers.argo_dataparser import ArgoDataParserConfig
+# NOTE HERE: Import dataparser for KITTI-360
+from nerfstudio.data.dataparsers.kitti_dataparser import KittiDataParserConfig
+# NOTE HERE: Import dataparser for gt pipeline
+from nerfstudio.data.dataparsers.gt_dataparser import GtDataParserConfig
 from nerfstudio.plugins.registry_dataparser import discover_dataparsers
 
 dataparsers = {
@@ -54,6 +60,9 @@ dataparsers = {
     "sitcoms3d-data": Sitcoms3DDataParserConfig(),
     "scannetpp-data": ScanNetppDataParserConfig(),
     "colmap": ColmapDataParserConfig(),
+    "argo-data": ArgoDataParserConfig(),  # NOTE HERE #
+    "kitti-data": KittiDataParserConfig(),  # NOTE HERE #
+    "gt-data": GtDataParserConfig(),  # NOTE HERE #
 }
 
 external_dataparsers, _ = discover_dataparsers()
