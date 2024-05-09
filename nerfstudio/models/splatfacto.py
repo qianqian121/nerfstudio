@@ -169,6 +169,7 @@ class SplatfactoModel(Model):
     def populate_modules(self):
         if self.seed_points is not None and not self.config.random_init:
             means = torch.nn.Parameter(self.seed_points[0])  # (Location, Color)
+            CONSOLE.log(f"num_points: {means.shape[0]}")
         else:
             means = torch.nn.Parameter((torch.rand((self.config.num_random, 3)) - 0.5) * self.config.random_scale)
         self.xys_grad_norm = None
@@ -188,6 +189,7 @@ class SplatfactoModel(Model):
             # We can have colors without points.
             and self.seed_points[1].shape[0] > 0
         ):
+            CONSOLE.log(f"seed_points colors: {self.seed_points[1].shape[0]}")
             shs = torch.zeros((self.seed_points[1].shape[0], dim_sh, 3)).float().cuda()
             if self.config.sh_degree > 0:
                 shs[:, 0, :3] = RGB2SH(self.seed_points[1] / 255)
