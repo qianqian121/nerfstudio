@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Type
 from typing_extensions import Literal
 
+import numpy as np
 import torch
 from rich.console import Console
 
@@ -170,6 +171,12 @@ class Argo(DataParser):
             camera_type=camera_type,
         )
         assert cameras.distortion_params is None, "Would like to disable distortion, but failed"
+        metadata = dict()
+        ply_file_path = '/mnt/data/project/github/Lightning-NeRF/data_pack/argo/nerf_data/133e2e0b-b0fe-3bb0-b1f9-c846fcfd29e8/train/pcd_clr_0.05.ply'
+        sparse_points = self._load_3D_points(ply_file_path, transform, scale_factor)
+        if sparse_points is not None:
+            metadata.update(sparse_points)
+            CONSOLE.log(f"loaded ply file: {ply_file_path}")
             
         dataparser_outputs = DataparserOutputs(
             image_filenames=image_filenames,
@@ -182,6 +189,7 @@ class Argo(DataParser):
                 'scale': scale_factor, 'trans': transform,
                 'depth_filenames': depth_filenames if len(depth_filenames) > 0 else None,
                 'depth_unit_scale_factor': self.config.depth_unit_scale_factor,
+                **metadata,
             }
         )
         
@@ -190,3 +198,43 @@ class Argo(DataParser):
                     f"#masks {len(mask_filenames)}, "
                     f"#depth {len(depth_filenames)}.")
         return dataparser_outputs
+
+
+    def _load_3D_points(self, ply_file_path: Path, transform_matrix: torch.Tensor, scale_factor: float):
+        """Loads point clouds positions and colors from .ply
+
+        Args:
+            ply_file_path: Path to .ply file
+            transform_matrix: Matrix to transform world coordinates
+            scale_factor: How much to scale the camera origins by.
+
+        Returns:
+            A dictionary of points: points3D_xyz and colors: points3D_rgb
+        """
+        import open3d as o3d  # Importing open3d is slow, so we only do it if we need it.
+
+        pcd = o3d.io.read_point_cloud(str(ply_file_path))
+
+        # if no points found don't read in an initial point cloud
+        if len(pcd.points) == 0:
+            return None
+
+        points3D = torch.from_numpy(np.asarray(pcd.points, dtype=np.float32))
+        points3D = (
+            torch.cat(
+                (
+                    points3D,
+                    torch.ones_like(points3D[..., :1]),
+                ),
+                -1,
+            )
+            @ transform_matrix.T
+        )
+        points3D *= scale_factor
+        points3D_rgb = torch.from_numpy((np.asarray(pcd.colors) * 255).astype(np.uint8))
+
+        out = {
+            "points3D_xyz": points3D,
+            "points3D_rgb": points3D_rgb,
+        }
+        return out
